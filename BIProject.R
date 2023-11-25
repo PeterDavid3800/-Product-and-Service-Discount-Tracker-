@@ -35,7 +35,7 @@ if (!requireNamespace("corrplot", quietly = TRUE)) {
 }
 library(corrplot)
 library(readr)
-Argos_UK <- read_csv("Github/-Product-and-Service-Discount-Tracker-/data/Argos_UK.csv")
+Argos_UK <- read_csv("data/Argos_UK.csv")
 
 # View the data
 View(Argos_UK)
@@ -48,7 +48,7 @@ sapply(Argos_UK, class)
 Argos_UK <- as.data.frame(lapply(Argos_UK, function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x)))
 
 # Frequency and percentage for selected columns
-columns_to_analyze <- c("Product Price", "Product Line Item", "Product Type")
+columns_to_analyze <- c(2,4,7)
 for (col in columns_to_analyze) {
   Argos_UK_freq <- Argos_UK[[col]]
   freq_table <- table(Argos_UK_freq)
@@ -65,8 +65,8 @@ calculate_mode <- function(column) {
 Argos_UK_ProductPrice_mode <- calculate_mode(Argos_UK$Product.Price)
 print(Argos_UK_ProductPrice_mode)
 
-Argos_UK_ProductLineItem_mode <- calculate_mode(Argos_UK$Product.Line.Item)
-print(Argos_UK_ProductLineItem_mode)
+Argos_UK_Category <- calculate_mode(Argos_UK$Category)
+print(Argos_UK_Category)
 
 Argos_UK_ProductType_mode <- calculate_mode(Argos_UK$Product.Type)
 print(Argos_UK_ProductType_mode)
@@ -106,5 +106,18 @@ missmap(Argos_UK, col = c("red", "grey"), legend = TRUE)
 # Plot correlation matrix
 corrplot(cor(Argos_UK[c(7)]), method = "circle")
 
-#Feature plot
-featurePlot(x = Argos_UK[c(7)], y = Argos_UK[c(4)], plot = "box")
+# Confirmation of Missing Values
+missing_values <- colSums(is.na(Argos_UK))
+print(missing_values)
+
+# Data Imputation
+imputed_values <- as.data.frame(lapply(Argos_UK[, 7], function(x) {
+  ifelse(is.na(x), { 
+    imputed_value <- mean(x, na.rm = TRUE)
+    print(paste("Imputed value for", names(x), ":", imputed_value))
+    imputed_value
+  }, x)
+}))
+
+# Data Transformation (Log Transformation for Product Price)
+Argos_UK$Product.Price <- log(Argos_UK$Product.Price + 1)
