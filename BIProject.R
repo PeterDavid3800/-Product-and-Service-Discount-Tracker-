@@ -111,13 +111,34 @@ missing_values <- colSums(is.na(Argos_UK))
 print(missing_values)
 
 # Data Imputation
-imputed_values <- as.data.frame(lapply(Argos_UK[, 7], function(x) {
+imputed_values <- as.data.frame(lapply(Argos_UK[, numeric_columns], function(x) {
   ifelse(is.na(x), { 
     imputed_value <- mean(x, na.rm = TRUE)
-    print(paste("Imputed value for", names(x), ":", imputed_value))
+    print(paste("Imputed value", names(x), ":", imputed_value))
     imputed_value
   }, x)
 }))
 
 # Data Transformation (Log Transformation for Product Price)
 Argos_UK$Product.Price <- log(Argos_UK$Product.Price + 1)
+
+# Data Transformation (Z-Score Normalization for Numeric Columns)
+numeric_columns <- sapply(Argos_UK, is.numeric)
+Argos_UK[, numeric_columns] <- scale(Argos_UK[, numeric_columns])
+
+# Data Transformation (Box-Cox Transformation for Numeric Columns)
+library(MASS)  # Ensure the MASS package is installed
+numeric_columns <- sapply(Argos_UK, is.numeric)
+Argos_UK[, numeric_columns] <- lapply(Argos_UK[, numeric_columns], function(x) {
+  if (all(x > 0)) {
+    boxcox(x)$x
+  } else {
+    x
+  }
+})
+
+# Data Transformation (One-Hot Encoding for Categorical Columns)
+categorical_columns <- sapply(Argos_UK, function(x) is.factor(x) | is.character(x))
+Argos_UK <- model.matrix(~., Argos_UK[, c(7, categorical_columns)], drop = TRUE)
+
+
