@@ -1,97 +1,111 @@
-if (!is.element("renv", installed.packages()[, 1])) {
+# Install and load necessary packages
+if (!requireNamespace("renv", quietly = TRUE)) {
   install.packages("renv", dependencies = TRUE)
 }
-require("renv")
+library(renv)
 
-.libPaths()
-
-lapply(.libPaths(), list.files)
-
-
-if (!is.element("languageserver", installed.packages()[, 1])) {
+if (!requireNamespace("languageserver", quietly = TRUE)) {
   install.packages("languageserver", dependencies = TRUE)
 }
-require("languageserver")
+library(languageserver)
 
-
-library(readr)
-Argos_UK <- read_csv("Github/-Product-and-Service-Discount-Tracker-/data/Argos_UK.csv")
-View(Argos_UK)
-
-dim(Argos_UK)
-
-sapply(Argos_UK, class)
-
-Argos_UK_freq <- Argos_UK$`Product Price`
-cbind(frequency = table(Argos_UK_freq),
-      percentage = prop.table(table(Argos_UK_freq)) *100)
-
-Argos_UK_freq <- Argos_UK$`Product Line Item`
-cbind(frequency = table(Argos_UK_freq),
-      percentage = prop.table(table(Argos_UK_freq)) *100)
-
-Argos_UK_freq <- Argos_UK$`Product Type`
-cbind(frequency = table(Argos_UK_freq),
-      percentage = prop.table(table(Argos_UK_freq)) *100)
-
-Argos_UK_ProductPrice_mode <- names(table(Argos_UK$`Product Price`))[
-  which(table(Argos_UK$`Product Price`) == max(table(Argos_UK$`Product Price`)))]
-print(Argos_UK_ProductPrice_mode)
-
-Argos_UK_ProductLineItem_mode <- names(table(Argos_UK$`Product Line Item`))[
-  which(table(Argos_UK$`Product Line Item`) == max(table(Argos_UK$`Product Line Item`)))]
-print(Argos_UK_ProductLineItem_mode)
-
-Argos_UK_ProductType_mode <- names(table(Argos_UK$`Product Type`))[
-  which(table(Argos_UK$`Product Type`) == max(table(Argos_UK$`Product Type`)))]
-
-print(Argos_UK_ProductType_mode)
-
-
-summary(Argos_UK)
-
-sapply(Argos_UK[, c(7)], sd)
-
-
-sapply(Argos_UK[, c(7)], var)
-
-sapply(Argos_UK [c(7)],kurtosis, type=2)
-
-
-sapply(Argos_UK [c(7)],skewness, type=2)
-
-Argos_UK_cov <- cov(Argos_UK [c(7)])
-View(Argos_UK_cov)
-
-Argos_UK_cor <- cor(Argos_UK [c(7)])
-View(Argos_UK_cor)
-
-Argos_UK_one_way_anova <- aov( `Product Price` ~ `Product Type`, data = Argos_UK)
-summary(Argos_UK_one_way_anova)
-
-Argos_UK_two_way_anova <- aov( `Product Price` ~ `Product Type`* `Product Line Item`, data = Argos_UK)
-summary(Argos_UK_two_way_anova)
-
-par(mfrow = c(7))
-for (i in 1:3) {
-  barplot(table(Argos_UK[, i]), main = names(Argos_UK)[i])
+if (!requireNamespace("readr", quietly = TRUE)) {
+  install.packages("readr", dependencies = TRUE)
 }
+library(readr)
 
-if (!is.element("Amelia", installed.packages()[, 1])) {
+if (!requireNamespace("Amelia", quietly = TRUE)) {
   install.packages("Amelia", dependencies = TRUE)
 }
-require("Amelia")
+library(Amelia)
 
-missmap(Argos_UK, col = c("red", "grey"), legend = TRUE)
-
-
-{plot.new(); dev.off()}
-
-if (!is.element("ggcorrplot", installed.packages()[, 1])) {
+if (!requireNamespace("ggcorrplot", quietly = TRUE)) {
   install.packages("ggcorrplot", dependencies = TRUE)
 }
-require("ggcorrplot")
-corrplot(cor(Argos_UK[, c(7)]), method = "circle")
+library(ggcorrplot)
+if (!requireNamespace("e1071", quietly = TRUE)) {
+  install.packages("e1071", dependencies = TRUE)
+}
+library(e1071)
+if (!requireNamespace("caret", quietly = TRUE)) {
+  install.packages("caret")
+}
+library(caret)
+if (!requireNamespace("corrplot", quietly = TRUE)) {
+  install.packages("corrplot")
+}
+library(corrplot)
+library(readr)
+Argos_UK <- read_csv("Github/-Product-and-Service-Discount-Tracker-/data/Argos_UK.csv")
+
+# View the data
+View(Argos_UK)
+
+# Check dimensions and data types
+dim(Argos_UK)
+sapply(Argos_UK, class)
+
+# Replace missing values with column means
+Argos_UK <- as.data.frame(lapply(Argos_UK, function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x)))
+
+# Frequency and percentage for selected columns
+columns_to_analyze <- c("Product Price", "Product Line Item", "Product Type")
+for (col in columns_to_analyze) {
+  Argos_UK_freq <- Argos_UK[[col]]
+  freq_table <- table(Argos_UK_freq)
+  result_table <- cbind(frequency = freq_table, percentage = prop.table(freq_table) * 100)
+  print(result_table)
+}
+
+# Mode calculation for selected columns
+calculate_mode <- function(column) {
+  mode_names <- names(table(column))[which(table(column) == max(table(column)))]
+  return(mode_names)
+}
+
+Argos_UK_ProductPrice_mode <- calculate_mode(Argos_UK$Product.Price)
+print(Argos_UK_ProductPrice_mode)
+
+Argos_UK_ProductLineItem_mode <- calculate_mode(Argos_UK$Product.Line.Item)
+print(Argos_UK_ProductLineItem_mode)
+
+Argos_UK_ProductType_mode <- calculate_mode(Argos_UK$Product.Type)
+print(Argos_UK_ProductType_mode)
+
+# Summary statistics
+summary(Argos_UK)
+any(is.na(Argos_UK))
+Argos_UK <- as.data.frame(lapply(Argos_UK, function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x)))
 
 
-featurePlot(x = Argos_UK[, c(7)], y = X20230412_20230719_BI1_BBIT4_1_StudentPerformanceDataset[, 100], plot = "box")
+# Descriptive statistics for "Product Price"
+sapply(Argos_UK[c(7)], sd)
+sapply(Argos_UK[c(7)], var)
+sapply(Argos_UK[c(7)], kurtosis, type = 2)
+sapply(Argos_UK[c(7)], skewness, type = 2)
+
+# Covariance and correlation matrices
+Argos_UK_cov <- cov(Argos_UK[c(7)])
+View(Argos_UK_cov)
+
+Argos_UK_cor <- cor(Argos_UK[c(7)])
+View(Argos_UK_cor)
+
+# One-way ANOVA
+Argos_UK_one_way_anova <- aov(Product.Price ~ Product.Type, data = Argos_UK)
+summary(Argos_UK_one_way_anova)
+
+# Bar plots for selected columns
+par(mfrow = c(1, length(7)))
+for (col in 7) {
+  barplot(table(Argos_UK[[col]]), main = col)
+}
+
+# Missing values visualization
+missmap(Argos_UK, col = c("red", "grey"), legend = TRUE)
+
+# Plot correlation matrix
+corrplot(cor(Argos_UK[c(7)]), method = "circle")
+
+#Feature plot
+featurePlot(x = Argos_UK[c(7)], y = Argos_UK[c(4)], plot = "box")
