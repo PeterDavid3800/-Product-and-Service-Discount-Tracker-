@@ -34,6 +34,25 @@ if (!requireNamespace("corrplot", quietly = TRUE)) {
   install.packages("corrplot")
 }
 library(corrplot)
+# Install and load the 'ipred' package
+if (!requireNamespace("ipred", quietly = TRUE)) {
+  install.packages("ipred", dependencies = TRUE)
+}
+library(ipred)#
+# Install and load the 'earth' package
+if (!requireNamespace("earth", quietly = TRUE)) {
+  install.packages("earth", dependencies = TRUE)
+}
+library(earth)
+# Install and load the 'randomForest' package
+if (!requireNamespace("randomForest", quietly = TRUE)) {
+  install.packages("randomForest", dependencies = TRUE)
+}
+library(randomForest)
+install.packages("SuperLearner")
+library(SuperLearner)
+install.packages("caretEnsemble")
+library(caretEnsemble)
 library(boot)
 
 library(readr)
@@ -200,3 +219,65 @@ ProductPrice2_model <- train(Product.Price ~ ., data = Argos_UK_train, method = 
 # Compare models
 compare_models <- resamples(list(Model1 = ProductPrice_model, Model2 = ProductPrice2_model))
 summary(compare_models)
+
+# Manual Search
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3, search = "random")
+
+tunegrid <- expand.grid(.mtry = c(1:5))
+
+modellist <- list()
+for (ntree in c(500, 800, 1000)) {
+  set.seed(123)  # Set a seed for reproducibility
+  rf_model <- train(Product.Price ~ ., data = Argos_UK_train, method = "rf", metric = "RMSE",
+                    tuneGrid = tunegrid,
+                    trControl = train_control,
+                    ntree = ntree)
+  key <- toString(ntree)
+  modellist[[key]] <- rf_model
+}
+
+# Lastly, we compare results to find which parameters gave the lowest RMSE
+print(modellist)
+
+results <- resamples(modellist)
+summary(results)
+dotplot(results)
+
+
+# Bagging
+# Train the bagged model using randomForest
+set.seed(123)
+bag_model <- randomForest(Product.Price ~ ., data = Argos_UK_train, ntree = 500, importance = TRUE)
+# Make sure 'Product.Price' is a numeric column in Argos_UK_test
+Argos_UK_test$Product.Price <- as.numeric(Argos_UK_test$Product.Price)
+
+# Make predictions on the test set
+bag_predictions <- predict(bag_model, newdata = Argos_UK_test)
+
+# Evaluate performance
+bag_rmse <- sqrt(mean((bag_predictions - Argos_UK_test$Product.Price)^2))
+cat("Bagging RMSE:", bag_rmse, "\n")
+
+# Create a caret model from the bagged model
+bag_caret_model <- list(model = bag_model, method = "rf", trControl = train_control)
+
+# Boosting
+set.seed(456)
+boost_model <- train(Product.Price ~ ., data = Argos_UK_train, method = "gbm", trControl = train_control)
+
+# Create a caret model from the boosting model
+boost_caret_model <- list(model = boost_model, method = "gbm", trControl = train_control)
+
+#Stacking
+# Create a list of caret models for stacking
+models_for_stacking <- list(bag = bag_caret_model, boost = boost_caret_model)
+
+# Use caretStack to stack the models
+stack_model <- caretStack(models_for_stacking)
+
+# Make predictions on the test set using the stacked model
+stack_predictions <- predict(stack_model, newdata = Argos_UK_test)
+
+# Evaluate performance of the stacked model
+stack_rmse <- sqrt(mean((stack_predictions - Argos_UK_test$Product.Price)^2))
+cat("Stacked Model RMSE:", stack_rmse, "\n")
