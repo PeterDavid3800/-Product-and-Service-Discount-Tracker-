@@ -34,9 +34,9 @@ if (!requireNamespace("corrplot", quietly = TRUE)) {
   install.packages("corrplot")
 }
 library(corrplot)
-library(readr)
 library(boot)
 
+library(readr)
 Argos_UK <- read_csv("data/Argos_UK.csv")
 
 # View the data
@@ -142,18 +142,26 @@ Argos_UK[, numeric_columns] <- lapply(Argos_UK[, numeric_columns], function(x) {
 categorical_columns <- sapply(Argos_UK, function(x) is.factor(x) | is.character(x))
 Argos_UK <- model.matrix(~., Argos_UK[, c(7, categorical_columns)], drop = TRUE)
 
-# Load libraries
-library(boot)
+# Load required libraries
+library(readr)
 library(caret)
-
-# Load data
+library(rpart)
+library(kknn)
+library(ROCR)
+library(pROC)
+library(MASS)
+library(readr)
 Argos_UK <- read_csv("data/Argos_UK.csv")
 
-# Display the first few rows of the data
-head(Argos_UK)
-
 # Replace missing values with column means
-Argos_UK <- as.data.frame(lapply(Argos_UK, function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x)))
+Argos_UK <- as.data.frame(lapply(Argos_UK, function(x) {
+  if (is.numeric(x) || is.logical(x)) {
+    ifelse(is.na(x), mean(x, na.rm = TRUE), x)
+  } else {
+    x
+  }
+}))
+
 
 # Check for missing values
 if (any(is.na(Argos_UK))) {
@@ -161,44 +169,34 @@ if (any(is.na(Argos_UK))) {
   Argos_UK <- na.omit(Argos_UK)
 }
 
-# Check for multicollinearity
-cor_matrix <- cor(Argos_UK[, sapply(Argos_UK, is.numeric)])
-highly_correlated <- findCorrelation(cor_matrix, cutoff = 0.8)
-if (length(highly_correlated) > 0) {
-  # Address multicollinearity (e.g., remove highly correlated variables)
-  Argos_UK <- Argos_UK[, -highly_correlated]
+# 1. Data Splitting ----
+set.seed(123)  # Set a seed for reproducibility
+train_index <- createDataPartition(Argos_UK$Product.Price, p = 0.75, list = FALSE)
+Argos_UK_train <- Argos_UK[train_index, ]
+Argos_UK_test <- Argos_UK[-train_index, ]
+
+your_statistic_function <- function(data, indices) {
+  sample_data <- data[indices]
+  return(mean(sample_data))
 }
 
-# Data Splitting
-set.seed(123)  # Set seed for reproducibility
-train_indices <- createDataPartition(Argos_UK$Product.Price, p = 0.7, list = FALSE)
-train_data <- Argos_UK[train_indices, ]
-test_data <- Argos_UK[-train_indices, ]
+# 2. Bootstrapping ----
+bootstrap_results <- boot(data = Argos_UK$Product.Price, statistic = your_statistic_function, R = 1000)
 
-# Retrain the model
-boot_model <- lm(Product.Price ~ ., data = train_data)
+# 3. Cross Validation ----
+train_control <- trainControl(method = "cv", number = 5)
+set.seed(456)  # Set a seed for reproducibility
+ProductPrice_model <- train(Product.Price ~ ., data = Argos_UK_train, method = "rf", trControl = train_control)
 
-# Bootstrapping with check for model convergence
-boot_results <- boot(data = train_data, statistic = function(data, indices) {
-  fit <- try(lm(Product.Price ~ ., data = data[indices, ]), silent = TRUE)
-  
-  if (inherits(fit, "try-error") || length(coef(fit)) != length(coef(boot_model))) {
-    return(rep(NA, length(coef(boot_model))))
-  }
-  
-  return(coef(fit))
-}, R = 1000)
+# 4. Model Training ----
+set.seed(789)  # Set a seed for reproducibility
+ProductPrice2_model <- train(Product.Price ~ ., data = Argos_UK_train, method = "rf")
 
-# Cross-validation (example using linear regression)/error starts here
-cv_model <- try(
-  train(Product.Price ~ ., data = train_data, method = "lm", trControl = trainControl(method = "cv")),
-  silent = TRUE
-)
+# 5. Model Performance Comparison ----
+set.seed(101)  # Set a seed for reproducibility
+ProductPrice_model <- train(Product.Price ~ ., data = Argos_UK_train, method = "rf", trControl = train_control)
+ProductPrice2_model <- train(Product.Price ~ ., data = Argos_UK_train, method = "rf", trControl = train_control)
 
-
-# Model training (linear regression)
-final_model <- lm(Product.Price ~ ., data = train_data)
-
-# Model performance comparison using resamples
-resamples_list <- resamples(list(Linear_Regression = final_model, CV_Model = cv_model))
-summary(resamples_list)
+# Compare models
+compare_models <- resamples(list(Model1 = ProductPrice_model, Model2 = ProductPrice2_model))
+summary(compare_models)
