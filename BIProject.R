@@ -195,14 +195,6 @@ cv_model <- try(
   silent = TRUE
 )
 
-# Check for errors in cross-validation
-if (inherits(cv_model, "try-error")) {
-  cat("Error occurred during cross-validation training.\n")
-  print(cv_model)
-} else {
-  # Print summary
-  summary(cv_model)
-}
 
 # Model training (linear regression)
 final_model <- lm(Product.Price ~ ., data = train_data)
