@@ -1,31 +1,43 @@
----
-title: "Business Intelligence Project"
-author: 135230 Peter David Aringo 4.2B
-date: "27/11/2023"
-output:
-  github_document:
-    toc: yes
-    toc_depth: 4
-    fig_width: 6
-    fig_height: 4
-    df_print: default
-editor_options:
-  chunk_output_type: console
----
+Business Project
+================
+<135230 Peter David Aringo 4.2B>
+<"27/11/2023">
+
 
 # Student Details
 
-+---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Student ID Number and Name**                    |   135230 - B - Peter Aringo                                                                                                                                              |
-+---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Course Code**                                   | BBT4206                                                                                                                                                                  |
-+---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Course Name**                                   | Business Intelligence II                                                                                                                                                 |
-+---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Program**                                       | Bachelor of Business Information Technology                                                                                                                              |
-+---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| **Semester Duration**                             | 21^st^ August 2023 to 28^th^ November 2023                                                                                                                               |
-+---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 76%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Student ID Number and Name</strong></td>
+<td><p><em></em></p>
+<ol type="1">
+<li><p>135230 - B - Peter Aringo</p></li>
+
+</ol></td>
+</tr>
+<tr class="odd">
+<td><strong>Course Code</strong></td>
+<td>BBT4206</td>
+</tr>
+<tr class="even">
+<td><strong>Course Name</strong></td>
+<td>Business Intelligence II</td>
+</tr>
+<tr class="odd">
+<td><strong>Program</strong></td>
+<td>Bachelor of Business Information Technology</td>
+</tr>
+<tr class="even">
+<td><strong>Semester Duration</strong></td>
+<td>21<sup>st</sup> August 2023 to 28<sup>th</sup> November 2023</td>
+</tr>
+</tbody>
+</table>
 
 # Setup Chunk
 
