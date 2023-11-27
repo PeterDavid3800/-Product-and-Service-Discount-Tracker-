@@ -1,7 +1,7 @@
-Business Project
+Business Intelligence II Project
 ================
-<135230 Peter David Aringo 4.2B>
-<"27/11/2023">
+135230 Peter David Aringo 4.2B<br>
+"27/11/2023"
 
 
 # Student Details
