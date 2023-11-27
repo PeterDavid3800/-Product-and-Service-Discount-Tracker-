@@ -1,0 +1,131 @@
+---
+title: "Business Intelligence Project"
+author: 135230 Peter David Aringo 4.2B
+date: "27/11/2023"
+output:
+  github_document:
+    toc: yes
+    toc_depth: 4
+    fig_width: 6
+    fig_height: 4
+    df_print: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Student Details
+
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Student ID Number and Name**                    |   135230 - B - Peter Aringo                                                                                                                                              |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Course Code**                                   | BBT4206                                                                                                                                                                  |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Course Name**                                   | Business Intelligence II                                                                                                                                                 |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Program**                                       | Bachelor of Business Information Technology                                                                                                                              |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Semester Duration**                             | 21^st^ August 2023 to 28^th^ November 2023                                                                                                                               |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+# Setup Chunk
+
+We start by installing all the required packages
+
+```{r Install Packages, echo=TRUE, message=FALSE, warning=FALSE}
+if (!requireNamespace("renv", quietly = TRUE)) {
+  install.packages("renv", dependencies = TRUE)
+}
+library(renv)
+
+if (!requireNamespace("languageserver", quietly = TRUE)) {
+  install.packages("languageserver", dependencies = TRUE)
+}
+library(languageserver)
+
+if (!requireNamespace("readr", quietly = TRUE)) {
+  install.packages("readr", dependencies = TRUE)
+}
+library(readr)
+
+if (!requireNamespace("Amelia", quietly = TRUE)) {
+  install.packages("Amelia", dependencies = TRUE)
+}
+library(Amelia)
+
+if (!requireNamespace("ggcorrplot", quietly = TRUE)) {
+  install.packages("ggcorrplot", dependencies = TRUE)
+}
+library(ggcorrplot)
+if (!requireNamespace("e1071", quietly = TRUE)) {
+  install.packages("e1071", dependencies = TRUE)
+}
+library(e1071)
+if (!requireNamespace("caret", quietly = TRUE)) {
+  install.packages("caret")
+}
+library(caret)
+if (!requireNamespace("corrplot", quietly = TRUE)) {
+  install.packages("corrplot")
+}
+library(corrplot)
+# Install and load the 'ipred' package
+if (!requireNamespace("ipred", quietly = TRUE)) {
+  install.packages("ipred", dependencies = TRUE)
+}
+library(ipred)#
+# Install and load the 'earth' package
+if (!requireNamespace("earth", quietly = TRUE)) {
+  install.packages("earth", dependencies = TRUE)
+}
+library(earth)
+# Install and load the 'randomForest' package
+if (!requireNamespace("randomForest", quietly = TRUE)) {
+  install.packages("randomForest", dependencies = TRUE)
+}
+library(randomForest)
+install.packages("SuperLearner")
+library(SuperLearner)
+install.packages("caretEnsemble")
+library(caretEnsemble)
+library(boot)
+```
+
+------------------------------------------------------------------------
+
+**Note:** the following "*KnitR*" options have been set as the defaults in this markdown:\
+`knitr::opts_chunk$set(echo = TRUE, warning = FALSE, eval = TRUE, collapse = FALSE, tidy.opts = list(width.cutoff = 80), tidy = TRUE)`.
+
+More KnitR options are documented here <https://bookdown.org/yihui/rmarkdown-cookbook/chunk-options.html> and here <https://yihui.org/knitr/options/>.
+
+```{r setup, echo=TRUE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(
+	eval = TRUE,
+	echo = TRUE,
+	warning = FALSE,
+	collapse = FALSE,
+	tidy = TRUE
+)
+```
+
+------------------------------------------------------------------------
+
+**Note:** the following "*R Markdown*" options have been set as the defaults in this markdown:
+
+> output:\
+> \
+> github_document:\
+> toc: yes\
+> toc_depth: 4\
+> fig_width: 6\
+> fig_height: 4\
+> df_print: default\
+> \
+> editor_options:\
+> chunk_output_type: console
+
+# 
+
+```{r Load Dataset}
+
+```
+
