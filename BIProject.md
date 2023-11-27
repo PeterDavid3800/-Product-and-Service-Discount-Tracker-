@@ -15,7 +15,7 @@ Business Project
 <tr class="odd">
 <td><strong>Student ID Number and Name</strong></td>
 <td><p><em></em></p>
-<ol type="1">
+<ol type="">
 <li><p>135230 - B - Peter Aringo</p></li>
 
 </ol></td>
